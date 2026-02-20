@@ -54,7 +54,7 @@ void keyboard_post_init_user() {
     // Force RGB lights to show test animation without writing EEPROM.
     rgblight_enable_noeeprom();
     // rgblight_mode_noeeprom(RGBLIGHT_MODE_RGB_TEST);
-　  keyball_set_cpi(NORMAL_CPI_VAL);
+　  keyball_set_cpi(NORMAL_CPI_IDX);
 #endif
 }
 
