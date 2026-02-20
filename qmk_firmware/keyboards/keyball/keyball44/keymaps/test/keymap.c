@@ -29,10 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 精密モードの速度（レベル0 = 400 DPI）
 #define PRECISION_CPI_IDX 0 
 
-// 独自キーコードの名前を定義
+// ここで既存のキーコード（F23, F24）に別名を付けます
 enum my_keycodes {
-  PRC_SW = SAFE_RANGE, // 押している間だけ精密 (Switch)
-  PRC_TOG              // 押すたびに切り替え (Toggle)
+  PRC_SW = KC_F23, // Remapで「F23」を置くと「押している間だけ精密」になる
+  PRC_TOG = KC_F24 // Remapで「F24」を置くと「トグル切り替え」になる
 };
 
 // 現在の状態を保存する変数
