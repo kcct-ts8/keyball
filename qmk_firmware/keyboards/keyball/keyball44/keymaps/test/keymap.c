@@ -18,6 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
+#ifdef POINTING_DEVICE_ENABLE
+#  include "drivers/sensors/pmw3360.h"
+#endif
+
 #include "quantum.h"
 
 // clang-format off
