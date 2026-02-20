@@ -1,4 +1,4 @@
-/*
+ｊ/*
 Copyright 2022 @Yowkees
 Copyright 2022 MURAOKA Taro (aka KoRoN, @kaoriya)
 
@@ -18,11 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
+// ▼▼▼ ここから追加 ▼▼▼
 #ifdef POINTING_DEVICE_ENABLE
 #  include "drivers/sensors/pmw3360.h"
 #endif
+// ▲▲▲ ここまで追加 ▲▲▲
 
 #include "quantum.h"
+
+// ▼▼▼ ここから追加 ▼▼▼
+static uint16_t cpi_values[] = { 400, 800, 1200, 1600, 2400 }; // 好みの速度リスト
+static uint8_t cpi_idx = 1; // 初期値（0なら400, 1なら800...）
+// ▲▲▲ ここまで追加 ▲▲▲
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -53,3 +60,20 @@ void oledkit_render_info_user(void) {
     keyball_oled_render_layerinfo();
 }
 #endif
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // ▼▼▼ ここから追加 ▼▼▼
+  switch (keycode) {
+    case KC_F24: // Remapで F24 を割り当てたキーが「DPI切り替え」になります
+      if (record->event.pressed) {
+        cpi_idx = (cpi_idx + 1) % (sizeof(cpi_values) / sizeof(cpi_values[0]));
+        #ifdef POINTING_DEVICE_ENABLE
+          pmw_set_cpi(cpi_values[cpi_idx]);
+        #endif
+      }
+      return false; // PCにはF24キーを入力しない
+  }
+  // ▲▲▲ ここまで追加 ▲▲▲
+
+  return true;
+}
