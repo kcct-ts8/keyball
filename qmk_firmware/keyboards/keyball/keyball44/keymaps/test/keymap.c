@@ -26,10 +26,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-// ▼▼▼ ここから追加 ▼▼▼
-static uint16_t cpi_values[] = { 400, 800, 1200, 1600, 2400 }; // 好みの速度リスト
-static uint8_t cpi_idx = 1; // 初期値（0なら400, 1なら800...）
-// ▲▲▲ ここまで追加 ▲▲▲
+// ▼▼▼ ここを書き換え ▼▼▼
+// 普段の速度（速め）
+#define NORMAL_CPI 2400 
+
+// 押している間の速度（激遅）
+#define PRECISION_CPI 400 
+// ▲▲▲ ここまで ▲▲▲
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -60,20 +63,19 @@ void oledkit_render_info_user(void) {
     keyball_oled_render_layerinfo();
 }
 #endif
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  // ▼▼▼ ここから追加 ▼▼▼
   switch (keycode) {
-    case KC_F24: // Remapで F24 を割り当てたキーが「DPI切り替え」になります
-      if (record->event.pressed) {
-        cpi_idx = (cpi_idx + 1) % (sizeof(cpi_values) / sizeof(cpi_values[0]));
-        #ifdef POINTING_DEVICE_ENABLE
-          pmw_set_cpi(cpi_values[cpi_idx]);
-        #endif
-      }
+    case KC_F24: // RemapでF24を設定したキーが「プレシジョンボタン」になる
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+          // キーを押した時：遅くする
+          pmw_set_cpi(PRECISION_CPI);
+        } else {
+          // キーを離した時：普段の速度に戻す
+          pmw_set_cpi(NORMAL_CPI);
+        }
+      #endif
       return false; // PCにはF24キーを入力しない
   }
-  // ▲▲▲ ここまで追加 ▲▲▲
-
   return true;
 }
