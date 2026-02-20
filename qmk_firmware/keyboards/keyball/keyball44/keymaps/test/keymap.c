@@ -24,10 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-// 普段の速度（レベル3 = 1600 DPI）
-#define NORMAL_CPI_IDX 16
-// 精密モードの速度（レベル0 = 400 DPI）
-#define PRECISION_CPI_IDX 6
+// 普段の速度（16 = 1600 DPI）
+#define NORMAL_CPI_VAL 16
+// 精密モードの速度（6 = 600 DPI）
+#define PRECISION_CPI_VAL 6
 
 // ここで既存のキーコード（F23, F24）に別名を付けます
 enum my_keycodes {
@@ -49,25 +49,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-void keyboard_post_init_user() {
+void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE
-    // Force RGB lights to show test animation without writing EEPROM.
-    rgblight_enable_noeeprom();
-    // rgblight_mode_noeeprom(RGBLIGHT_MODE_RGB_TEST);
-　  keyball_set_cpi(NORMAL_CPI_IDX);
+    // LED設定をEEPROM（メモリ）に保存しない設定を無効化（＝保存するようにする）
+    // ここをコメントアウトしておくと、Remapで決めた色が再起動後も保持されます
+    // rgblight_enable_noeeprom();
+#endif
+
+#ifdef POINTING_DEVICE_ENABLE
+    // 起動時にデフォルト速度を適用
+    keyball_set_cpi(NORMAL_CPI_VAL);
 #endif
 }
 
 #ifdef OLED_ENABLE
-
 #    include "lib/oledkit/oledkit.h"
-
 void oledkit_render_info_user(void) {
     keyball_oled_render_keyinfo();
     keyball_oled_render_ballinfo();
     keyball_oled_render_layerinfo();
 }
 #endif
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     
@@ -75,13 +78,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case PRC_SW:
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
-          // キーを押した時：精密モード(レベル0)にする
-          keyball_set_cpi(PRECISION_CPI_IDX);
+          // キーを押した時
+          keyball_set_cpi(PRECISION_CPI_VAL);
         } else {
-          // キーを離した時：
-          // もしトグルモードで精密化されていなければ、普段の速度(レベル3)に戻す
+          // キーを離した時
           if (!is_precision_mode) {
-             keyball_set_cpi(NORMAL_CPI_IDX);
+             keyball_set_cpi(NORMAL_CPI_VAL);
           }
         }
       #endif
@@ -93,11 +95,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         if (record->event.pressed) {
           if (is_precision_mode) {
             // 今が精密モードなら -> 普段に戻す
-            keyball_set_cpi(NORMAL_CPI_IDX);
+            keyball_set_cpi(NORMAL_CPI_VAL);
             is_precision_mode = false;
           } else {
             // 今が普段モードなら -> 精密にする
-            keyball_set_cpi(PRECISION_CPI_IDX);
+            keyball_set_cpi(PRECISION_CPI_VAL);
             is_precision_mode = true;
           }
         }
