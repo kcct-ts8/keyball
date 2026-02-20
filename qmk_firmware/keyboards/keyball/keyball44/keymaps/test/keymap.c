@@ -18,21 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
-// ▼▼▼ ここから追加 ▼▼▼
 #ifdef POINTING_DEVICE_ENABLE
 #  include "drivers/sensors/pmw3360.h"
 #endif
-// ▲▲▲ ここまで追加 ▲▲▲
 
 #include "quantum.h"
 
-// ▼▼▼ ここを書き換え ▼▼▼
-// 普段の速度（速め）
 #define NORMAL_CPI 1600 
-
-// 押している間の速度（激遅）
 #define PRECISION_CPI 400 
-// ▲▲▲ ここまで ▲▲▲
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -65,17 +58,15 @@ void oledkit_render_info_user(void) {
 #endif
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    case KC_F24: // RemapでF24を設定したキーが「プレシジョンボタン」になる
+    case KC_F24: 
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
-          // キーを押した時：遅くする
-          pmw_set_cpi(PRECISION_CPI);
+          keyball_set_cpi(PRECISION_CPI);
         } else {
-          // キーを離した時：普段の速度に戻す
-          pmw_set_cpi(NORMAL_CPI);
+          keyball_set_cpi(NORMAL_CPI);
         }
       #endif
-      return false; // PCにはF24キーを入力しない
+      return false; 
   }
   return true;
 }
