@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ▼▼▼ ここを書き換え ▼▼▼
 // 普段の速度（速め）
-#define NORMAL_CPI 2400 
+#define NORMAL_CPI 1600 
 
 // 押している間の速度（激遅）
 #define PRECISION_CPI 400 
