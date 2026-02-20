@@ -24,8 +24,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-#define NORMAL_CPI 1600 
-#define PRECISION_CPI 400 
+// 普段の速度（レベル番号を指定）
+// 0:400, 1:800, 2:1200, 3:1600, 4:2400
+#define NORMAL_CPI_IDX 4  
+
+// 精密モードの速度（レベル番号を指定）
+#define PRECISION_CPI_IDX 0
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -61,9 +65,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case KC_F24: 
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
-          keyball_set_cpi(PRECISION_CPI);
+          keyball_set_cpi(PRECISION_CPI_IDX);
         } else {
-          keyball_set_cpi(NORMAL_CPI);
+          keyball_set_cpi(NORMAL_CPI_IDX);
         }
       #endif
       return false; 
