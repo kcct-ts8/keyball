@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // 普段の速度（レベル3 = 1600 DPI）
 #define NORMAL_CPI_IDX 12
 // 精密モードの速度（レベル0 = 400 DPI）
-#define PRECISION_CPI_IDX 3
+#define PRECISION_CPI_IDX 6
 
 // ここで既存のキーコード（F23, F24）に別名を付けます
 enum my_keycodes {
