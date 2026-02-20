@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quantum.h"
 
 // 普段の速度（レベル3 = 1600 DPI）
-#define NORMAL_CPI_IDX 12
+#define NORMAL_CPI_IDX 16
 // 精密モードの速度（レベル0 = 400 DPI）
 #define PRECISION_CPI_IDX 6
 
