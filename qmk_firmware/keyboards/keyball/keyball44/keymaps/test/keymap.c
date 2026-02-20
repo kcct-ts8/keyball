@@ -24,12 +24,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-// 普段の速度（レベル番号を指定）
-// 0:400, 1:800, 2:1200, 3:1600, 4:2400
-#define NORMAL_CPI_IDX 4  
+// 普段の速度（レベル3 = 1600 DPI）
+#define NORMAL_CPI_IDX 3  
+// 精密モードの速度（レベル0 = 400 DPI）
+#define PRECISION_CPI_IDX 0 
 
-// 精密モードの速度（レベル番号を指定）
-#define PRECISION_CPI_IDX 0
+// 独自キーコードの名前を定義
+enum my_keycodes {
+  PRC_SW = SAFE_RANGE, // 押している間だけ精密 (Switch)
+  PRC_TOG              // 押すたびに切り替え (Toggle)
+};
+
+// 現在の状態を保存する変数
+static bool is_precision_mode = false;
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -62,15 +69,41 @@ void oledkit_render_info_user(void) {
 #endif
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    case KC_F24: 
+    
+    // ▼▼▼ 押している間だけ精密モード (Switch) ▼▼▼
+    case PRC_SW:
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
+          // キーを押した時：精密モード(レベル0)にする
           keyball_set_cpi(PRECISION_CPI_IDX);
         } else {
-          keyball_set_cpi(NORMAL_CPI_IDX);
+          // キーを離した時：
+          // もしトグルモードで精密化されていなければ、普段の速度(レベル3)に戻す
+          if (!is_precision_mode) {
+             keyball_set_cpi(NORMAL_CPI_IDX);
+          }
         }
       #endif
-      return false; 
+      return false; // PCにはキー入力を送らない
+
+    // ▼▼▼ 押すたびに切り替え (Toggle) ▼▼▼
+    case PRC_TOG:
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+          if (is_precision_mode) {
+            // 今が精密モードなら -> 普段に戻す
+            keyball_set_cpi(NORMAL_CPI_IDX);
+            is_precision_mode = false;
+          } else {
+            // 今が普段モードなら -> 精密にする
+            keyball_set_cpi(PRECISION_CPI_IDX);
+            is_precision_mode = true;
+          }
+        }
+      #endif
+      return false;
+      
+    // 他のキーコード処理があればここに続く...
   }
   return true;
 }
