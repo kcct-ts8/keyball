@@ -108,5 +108,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       
     // 他のキーコード処理があればここに続く...
   }
+  
   return true;
 }
+
+
+// ==========================================
+// ▼▼▼ コンボ（同時押し）の設定 ▼▼▼
+// ==========================================
+#ifdef COMBO_ENABLE
+
+// 1. コンボに名前をつける
+enum combos {
+  CMB_ESC,
+  CMB_ENT,
+  CMB_BSPC,
+  CMB_DEL,
+};
+
+// 2. 同時押しするキーの組み合わせを定義する（必ず最後に COMBO_END をつける）
+const uint16_t PROGMEM combo_esc[]  = {KC_J, KC_K, COMBO_END};
+const uint16_t PROGMEM combo_ent[]  = {KC_K, KC_L, COMBO_END};
+const uint16_t PROGMEM combo_bspc[] = {KC_U, KC_I, COMBO_END};
+const uint16_t PROGMEM combo_del[]  = {KC_O, KC_P, COMBO_END};
+
+// 3. 組み合わせと、発動するキーを紐付ける
+combo_t key_combos[] = {
+  [CMB_ESC]  = COMBO(combo_esc, KC_ESC),   // J + K で Esc
+  [CMB_ENT]  = COMBO(combo_ent, KC_ENT),   // K + L で Enter
+  [CMB_BSPC] = COMBO(combo_bspc, KC_BSPC), // U + I で Backspace
+  [CMB_DEL]  = COMBO(combo_del, KC_DEL),   // O + P で Delete
+};
+
+// 同時押しの判定時間（ミリ秒）。誤爆する場合はこの数字を減らします。
+uint16_t COMBO_TERM = 50; 
+
+#endif
+// ==========================================
+// ▲▲▲ コンボの設定ここまで ▲▲▲
+// ==========================================
