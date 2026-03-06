@@ -26,8 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ▼▼▼ 変更点1：固定値(#define)から「変数(uint8_t)」に変更 ▼▼▼
 // 起動時のデフォルト速度
-uint8_t normal_cpi_val = 16;     // 1600 DPI
-uint8_t precision_cpi_val = 6;   // 600 DPI
+uint8_t normal_cpi_val = 14;     // 1400 DPI
+uint8_t precision_cpi_val = 8;   // 800 DPI
 
 // ここで既存のキーコード（F23, F24）に別名を付けます
 enum my_keycodes {
