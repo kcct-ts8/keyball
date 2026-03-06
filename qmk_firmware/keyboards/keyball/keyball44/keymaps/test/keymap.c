@@ -140,9 +140,6 @@ combo_t key_combos[] = {
   [CMB_DEL]  = COMBO(combo_del, KC_DEL),   // O + P で Delete
 };
 
-// 同時押しの判定時間（ミリ秒）。誤爆する場合はこの数字を減らします。
-uint16_t COMBO_TERM = 50; 
-
 #endif
 // ==========================================
 // ▲▲▲ コンボの設定ここまで ▲▲▲
