@@ -24,10 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "quantum.h"
 
-// 普段の速度（16 = 1600 DPI）
-#define NORMAL_CPI_VAL 16
-// 精密モードの速度（6 = 600 DPI）
-#define PRECISION_CPI_VAL 6
+// ▼▼▼ 変更点1：固定値(#define)から「変数(uint8_t)」に変更 ▼▼▼
+// 起動時のデフォルト速度
+uint8_t normal_cpi_val = 16;     // 1600 DPI
+uint8_t precision_cpi_val = 6;   // 600 DPI
 
 // ここで既存のキーコード（F23, F24）に別名を付けます
 enum my_keycodes {
@@ -37,17 +37,6 @@ enum my_keycodes {
 
 // 現在の状態を保存する変数
 static bool is_precision_mode = false;
-
-// clang-format off
-//const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-//  [0] = LAYOUT_universal(
-//    KC_ESC   , KC_Q     , KC_W     , KC_E     , KC_R     , KC_T     ,                                        KC_Y     , KC_U     , KC_I     , KC_O     , KC_P     , KC_MINS  ,
-//    KC_TAB   , KC_A     , KC_S     , KC_D     , KC_F     , KC_G     ,                                        KC_H     , KC_J     , KC_K     , KC_L     , KC_SCLN  , KC_QUOT  ,
-//    KC_LSFT  , KC_Z     , KC_X     , KC_C     , KC_V     , KC_B     ,                                        KC_N     , KC_M     , KC_COMM  , KC_DOT   , KC_SLSH  , KC_RSFT  ,
-//                    KC_LCTL  , KC_LGUI  , KC_LALT  ,       KC_SPC   , KC_DEL   ,                  KC_BSPC  , KC_ENT   ,      KC_RALT  , KC_RGUI  , KC_RCTL
-//  ),
-//};
-// clang-format on
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -113,15 +102,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 void keyboard_post_init_user(void) {
-#ifdef RGBLIGHT_ENABLE
-    // LED設定をEEPROM（メモリ）に保存しない設定を無効化（＝保存するようにする）
-    // ここをコメントアウトしておくと、Remapで決めた色が再起動後も保持されます
-    // rgblight_enable_noeeprom();
-#endif
-
 #ifdef POINTING_DEVICE_ENABLE
-    // 起動時にデフォルト速度を適用
-    keyball_set_cpi(NORMAL_CPI_VAL);
+    // 起動時にデフォルトの通常速度を適用
+    keyball_set_cpi(normal_cpi_val);
 #endif
 }
 
@@ -141,34 +124,91 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case PRC_SW:
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
-          // キーを押した時
-          keyball_set_cpi(PRECISION_CPI_VAL);
+          keyball_set_cpi(precision_cpi_val);
         } else {
-          // キーを離した時
           if (!is_precision_mode) {
-             keyball_set_cpi(NORMAL_CPI_VAL);
+             keyball_set_cpi(normal_cpi_val);
           }
         }
       #endif
-      return false; // PCにはキー入力を送らない
+      return false; 
 
     // ▼▼▼ 押すたびに切り替え (Toggle) ▼▼▼
     case PRC_TOG:
       #ifdef POINTING_DEVICE_ENABLE
         if (record->event.pressed) {
           if (is_precision_mode) {
-            // 今が精密モードなら -> 普段に戻す
-            keyball_set_cpi(NORMAL_CPI_VAL);
+            keyball_set_cpi(normal_cpi_val);
             is_precision_mode = false;
           } else {
-            // 今が普段モードなら -> 精密にする
-            keyball_set_cpi(PRECISION_CPI_VAL);
+            keyball_set_cpi(precision_cpi_val);
             is_precision_mode = true;
           }
         }
       #endif
       return false;
       
+    // ▼▼▼ 変更点2：DPI調整キーを「ハイジャック」して独自変数に同期させる ▼▼▼
+    // DPI +100
+    case CPI_I100:
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+            if (is_precision_mode) {
+                if (precision_cpi_val < 120) precision_cpi_val += 1; // 上限120(12000DPI)
+                keyball_set_cpi(precision_cpi_val);
+            } else {
+                if (normal_cpi_val < 120) normal_cpi_val += 1;
+                keyball_set_cpi(normal_cpi_val);
+            }
+        }
+      #endif
+      return false; // Keyballの標準処理をキャンセルして独自処理のみ実行
+
+    // DPI -100
+    case CPI_D100:
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+            if (is_precision_mode) {
+                if (precision_cpi_val > 1) precision_cpi_val -= 1; // 下限1(100DPI)
+                keyball_set_cpi(precision_cpi_val);
+            } else {
+                if (normal_cpi_val > 1) normal_cpi_val -= 1;
+                keyball_set_cpi(normal_cpi_val);
+            }
+        }
+      #endif
+      return false;
+
+    // DPI +1000
+    case CPI_I1K:
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+            if (is_precision_mode) {
+                if (precision_cpi_val < 110) precision_cpi_val += 10;
+                keyball_set_cpi(precision_cpi_val);
+            } else {
+                if (normal_cpi_val < 110) normal_cpi_val += 10;
+                keyball_set_cpi(normal_cpi_val);
+            }
+        }
+      #endif
+      return false;
+
+    // DPI -1000
+    case CPI_D1K:
+      #ifdef POINTING_DEVICE_ENABLE
+        if (record->event.pressed) {
+            if (is_precision_mode) {
+                if (precision_cpi_val > 10) precision_cpi_val -= 10;
+                keyball_set_cpi(precision_cpi_val);
+            } else {
+                if (normal_cpi_val > 10) normal_cpi_val -= 10;
+                keyball_set_cpi(normal_cpi_val);
+            }
+        }
+      #endif
+      return false;
+
     // 他のキーコード処理があればここに続く...
   }
   
