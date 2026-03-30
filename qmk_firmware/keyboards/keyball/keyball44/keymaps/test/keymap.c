@@ -41,11 +41,17 @@ static bool is_precision_mode = false;
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // =========================================================
-  // Layer 0: 基本配列 (Base)
+  // Layer 0: 基本配列 (Base) - ★Home Row Mods仕様に進化！
   // =========================================================
   [0] = LAYOUT_universal(
     KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   ,                                      KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_RBRC,
-    KC_LCTL, KC_A   , KC_S   , KC_D   , KC_F   , KC_G   ,                                      KC_H   , KC_J   , KC_K   , KC_L   , LT(1, KC_COMM), KC_BSLS,
+    
+    // ▼▼ ここが Home Row Mods です ▼▼
+    // 左手: A=Cmd, S=Alt(Option), D=Ctrl, F=Shift
+    // 右手: J=Shift, K=Ctrl, L=Alt(Option) （※右小指は元からLayer1切替なのでそのまま維持）
+    KC_LCTL, GUI_T(KC_A), ALT_T(KC_S), CTL_T(KC_D), SFT_T(KC_F), KC_G   ,                      KC_H   , SFT_T(KC_J), CTL_T(KC_K), ALT_T(KC_L), LT(1, KC_COMM), KC_BSLS,
+    // ▲▲ ここまで ▲▲
+
     KC_LSFT, KC_Z   , KC_X   , KC_C   , KC_V   , KC_B   ,                                      KC_N   , KC_M   , KC_COMM, KC_DOT , KC_SLSH, TG(1)  ,
              LT(3, KC_BSPC), LT(2, KC_ESC), LT(1, KC_LALT), KC_LGUI, LT(4, KC_SPC),    _______, _______, LT(5, KC_MINS), LT(2, KC_ENT), LT(3, KC_LBRC)
   ),
@@ -57,7 +63,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______, SGUI(KC_1), SGUI(KC_2), LCTL(SGUI(KC_3)), LCTL(SGUI(KC_4)), LCTL(KC_T),           _______, KC_F17 , KC_F19 , KC_F18 , KC_F13 , KC_F12 ,
     PRC_SW , PRC_TOG   , _______   , LALT(KC_C)      , LCTL(SGUI(KC_D)), KC_F15    ,           KC_BSPC, KC_MS_BTN1, SCRL_MO, KC_MS_BTN2, KC_F16 , KC_F11 ,
     _______, _______   , _______   , _______         , LCTL(LALT(KC_SPC)), KC_F14  ,           KC_VOLD, KC_VOLU, KC_MS_BTN3, KC_MUTE, _______, _______,
-             _______, _______, _______, _______, _______,                              _______, _______, _______, _______, _______
+             _______, _______, _______, _______, _______,                               _______, _______, _______, _______, _______
   ),
 
   // =========================================================
