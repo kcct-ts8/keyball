@@ -229,30 +229,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 // 1. コンボに名前をつける
 enum combos {
-  CMB_ESC_L, // 左手の Esc
-  CMB_TAB,   // 左手の Tab
-  CMB_ESC_R, // 右手の Esc (元の設定)
-  CMB_ENT,
-  CMB_BSPC,
-  CMB_DEL,
+  CMB_TAB,   // 右手の Tab (J + K)
+  CMB_ESC,   // 右手の Esc (U + I)
 };
 
-// 2. 同時押しするキーの組み合わせを定義する（必ず最後に COMBO_END をつける）
-const uint16_t PROGMEM combo_esc_l[] = {KC_Q, KC_W, COMBO_END};
-const uint16_t PROGMEM combo_tab[]   = {KC_W, KC_E, COMBO_END};
-const uint16_t PROGMEM combo_esc_r[] = {KC_J, KC_K, COMBO_END};
-const uint16_t PROGMEM combo_ent[]   = {KC_K, KC_L, COMBO_END};
-const uint16_t PROGMEM combo_bspc[]  = {KC_U, KC_I, COMBO_END};
-const uint16_t PROGMEM combo_del[]   = {KC_O, KC_P, COMBO_END};
+// 2. 同時押しするキーの組み合わせを定義する（※左手の危険なコンボを削除）
+const uint16_t PROGMEM combo_tab[]   = {KC_J, KC_K, COMBO_END};
+const uint16_t PROGMEM combo_esc[]   = {KC_U, KC_I, COMBO_END};
 
 // 3. 組み合わせと、発動するキーを紐付ける
 combo_t key_combos[] = {
-  [CMB_ESC_L] = COMBO(combo_esc_l, KC_ESC),  // Q + W で Esc
-  [CMB_TAB]   = COMBO(combo_tab, KC_TAB),    // W + E で Tab
-  [CMB_ESC_R] = COMBO(combo_esc_r, KC_ESC),  // J + K で Esc
-  [CMB_ENT]   = COMBO(combo_ent, KC_ENT),    // K + L で Enter
-  [CMB_BSPC]  = COMBO(combo_bspc, KC_BSPC),  // U + I で Backspace
-  [CMB_DEL]   = COMBO(combo_del, KC_DEL),    // O + P で Delete
+  [CMB_TAB]   = COMBO(combo_tab, KC_TAB),    // J + K で Tab！ (超一等地)
+  [CMB_ESC]   = COMBO(combo_esc, KC_ESC),    // U + I で Esc
 };
 
 #endif
