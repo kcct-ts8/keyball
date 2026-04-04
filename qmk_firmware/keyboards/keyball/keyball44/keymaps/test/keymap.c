@@ -16,6 +16,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// ▼▼▼ #include の前にこれを追記します ▼▼▼
+#undef TAPPING_TERM
+#define TAPPING_TERM 175
+#define PERMISSIVE_HOLD
+// ▲▲▲ ここまで ▲▲▲
+
 #include QMK_KEYBOARD_H
 
 #ifdef POINTING_DEVICE_ENABLE
