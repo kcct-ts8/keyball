@@ -236,7 +236,9 @@ enum combos {
   CMB_ESC,   // Esc (J + K)
 };
 // 2. 同時押しするキーの組み合わせを定義する
-const uint16_t PROGMEM combo_esc[] = {KC_J, KC_K, COMBO_END};
+// const uint16_t PROGMEM combo_esc[] = {KC_J, KC_K, COMBO_END};
+const uint16_t PROGMEM combo_esc[] = {SFT_T(KC_J), CTL_T(KC_K), COMBO_END};
+
 // 3. 組み合わせと、発動するキーを紐付ける
 combo_t key_combos[] = {
   [CMB_ESC] = COMBO(combo_esc, KC_ESC),    // J + K で Esc！ (Vim定番、誤爆しにくい)
