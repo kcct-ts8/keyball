@@ -231,23 +231,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 // ▼▼▼ コンボ（同時押し）の設定 ▼▼▼
 // ==========================================
 #ifdef COMBO_ENABLE
-
 // 1. コンボに名前をつける
 enum combos {
-  CMB_TAB,   // 右手の Tab (U + I)
-  CMB_ESC,   // 右手の Esc (I + O)
+  CMB_ESC,   // Esc (J + K)
 };
-
 // 2. 同時押しするキーの組み合わせを定義する
-const uint16_t PROGMEM combo_tab[]   = {KC_U, KC_I, COMBO_END};
-const uint16_t PROGMEM combo_esc[]   = {KC_I, KC_O, COMBO_END};
-
+const uint16_t PROGMEM combo_esc[] = {KC_J, KC_K, COMBO_END};
 // 3. 組み合わせと、発動するキーを紐付ける
 combo_t key_combos[] = {
-  [CMB_TAB]   = COMBO(combo_tab, KC_TAB),    // U + I で Tab！ (100%確実な一等地)
-  [CMB_ESC]   = COMBO(combo_esc, KC_ESC),    // I + O で Esc！ (確実な発動)
+  [CMB_ESC] = COMBO(combo_esc, KC_ESC),    // J + K で Esc！ (Vim定番、誤爆しにくい)
 };
-
 #endif
 // ==========================================
 // ▲▲▲ コンボの設定ここまで ▲▲▲
