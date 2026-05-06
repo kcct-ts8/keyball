@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // ▼▼▼ #include の前にこれを追記します ▼▼▼
 #undef TAPPING_TERM
-#define TAPPING_TERM 175
-#define PERMISSIVE_HOLD
+#define TAPPING_TERM 200          // デフォルト200ms（その他のキー用）
+#define TAPPING_TERM_PER_KEY      // キーごとに個別のTapping Termを設定可能にする
+#define QUICK_TAP_TERM 100        // 同じキーを100ms以内に連続タップ → 必ずタップ扱い（連打改善）
+#define HOLD_ON_OTHER_KEY_PRESS   // ホールド中に別キーを押した瞬間にホールド確定（PERMISSIVE_HOLDから変更）
 // ▲▲▲ ここまで ▲▲▲
 
 #include QMK_KEYBOARD_H
@@ -47,11 +49,11 @@ static bool is_precision_mode = false;
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   // =========================================================
-  // Layer 0: 基本配列 (Base) - ★Home Row Mods仕様に進化！
+  // Layer 0: 基本配列 (Base) - ★Home Row Mods仕様
   // =========================================================
   [0] = LAYOUT_universal(
     KC_TAB , KC_Q   , KC_W   , KC_E   , KC_R   , KC_T   ,                                      KC_Y   , KC_U   , KC_I   , KC_O   , KC_P   , KC_RBRC,
-    
+
     // ▼▼ ここが Home Row Mods です ▼▼
     // 左手: A=Cmd, S=Alt(Option), D=Ctrl, F=Shift
     // 右手: J=Shift, K=Ctrl, L=Alt(Option) （※右小指は元からLayer1切替なのでそのまま維持）
@@ -113,6 +115,55 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
+// ==========================================
+// ▼▼▼ キーごとのTapping Term設定 ▼▼▼
+// ==========================================
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+
+        // --------------------------------------------------
+        // Home Row Mods: 長めに設定してロール誤爆を防ぐ
+        // 指が長く触れても誤爆しにくいよう220ms
+        // --------------------------------------------------
+        case GUI_T(KC_A):
+        case ALT_T(KC_S):
+        case CTL_T(KC_D):
+        case SFT_T(KC_F):
+        case SFT_T(KC_J):
+        case CTL_T(KC_K):
+        case ALT_T(KC_L):
+            return 220;
+
+        // --------------------------------------------------
+        // 親指のLTキー: 意図的な操作なので短くて良い
+        // レイヤー切替のレスポンスを優先して150ms
+        // --------------------------------------------------
+        case LT(3, KC_BSPC):
+        case LT(2, KC_ESC):
+        case LT(1, KC_LALT):
+        case LT(4, KC_SPC):
+        case LT(5, KC_MINS):
+        case LT(2, KC_ENT):
+        case LT(3, KC_LBRC):
+            return 150;
+
+        // --------------------------------------------------
+        // 右手小指のLT(1, KC_COMM): 小指は動作が遅めなのでやや長く
+        // --------------------------------------------------
+        case LT(1, KC_COMM):
+            return 200;
+
+        // --------------------------------------------------
+        // その他: デフォルト (200ms)
+        // --------------------------------------------------
+        default:
+            return TAPPING_TERM;
+    }
+}
+// ==========================================
+// ▲▲▲ Tapping Term設定ここまで ▲▲▲
+// ==========================================
+
 void keyboard_post_init_user(void) {
 #ifdef POINTING_DEVICE_ENABLE
     // 起動時にデフォルトの通常速度を適用
@@ -131,7 +182,7 @@ void oledkit_render_info_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    
+
     // ▼▼▼ 押している間だけ精密モード (Switch) ▼▼▼
     case PRC_SW:
       #ifdef POINTING_DEVICE_ENABLE
@@ -143,7 +194,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           }
         }
       #endif
-      return false; 
+      return false;
 
     // ▼▼▼ 押すたびに切り替え (Toggle) ▼▼▼
     case PRC_TOG:
@@ -159,7 +210,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
       #endif
       return false;
-      
+
     // ▼▼▼ 変更点2：DPI調整キーを「ハイジャック」して独自変数に同期させる ▼▼▼
     // DPI +100
     case CPI_I100:
@@ -223,7 +274,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     // 他のキーコード処理があればここに続く...
   }
-  
+
   return true;
 }
 
@@ -236,7 +287,6 @@ enum combos {
   CMB_ESC,   // Esc (J + K)
 };
 // 2. 同時押しするキーの組み合わせを定義する
-// const uint16_t PROGMEM combo_esc[] = {KC_J, KC_K, COMBO_END};
 const uint16_t PROGMEM combo_esc[] = {SFT_T(KC_J), CTL_T(KC_K), COMBO_END};
 
 // 3. 組み合わせと、発動するキーを紐付ける
